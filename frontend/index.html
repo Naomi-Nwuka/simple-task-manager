@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task Manager</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 40px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .input-area {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    input {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .add-button {
+      background: #333;
+      color: white;
+    }
+
+    .task {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .task-title {
+      flex: 1;
+      cursor: pointer;
+    }
+
+    .completed {
+      text-decoration: line-through;
+      color: #888;
+    }
+
+    .delete-button {
+      background: #d9534f;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <h1>Task Manager</h1>
+
+    <div class="input-area">
+      <input
+        type="text"
+        id="taskInput"
+        placeholder="Enter a task"
+      >
+
+      <button class="add-button" onclick="addTask()">
+        Add
+      </button>
+    </div>
+
+    <div id="taskList"></div>
+  </div>
+
+  <script>
+    const API_URL = "http://localhost:8082";
+
+    async function loadTasks() {
+      try {
+        const response = await fetch(`${API_URL}/tasks`);
+        const tasks = await response.json();
+
+        const taskList = document.getElementById("taskList");
+
+        taskList.innerHTML = "";
+
+        tasks.forEach(task => {
+          const taskDiv = document.createElement("div");
+          taskDiv.className = "task";
+
+          taskDiv.innerHTML = `
+            <span
+              class="task-title ${task.completed ? "completed" : ""}"
+              onclick="toggleTask(${task.id})"
+            >
+              ${task.title}
+            </span>
+
+            <button
+              class="delete-button"
+              onclick="deleteTask(${task.id})"
+            >
+              Delete
+            </button>
+          `;
+
+          taskList.appendChild(taskDiv);
+        });
+
+      } catch (error) {
+        console.error("Could not load tasks:", error);
+      }
+    }
+
+    async function addTask() {
+      const input = document.getElementById("taskInput");
+      const title = input.value.trim();
+
+      if (!title) {
+        return;
+      }
+
+      try {
+        await fetch(`${API_URL}/tasks`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            title: title
+          })
+        });
+
+        input.value = "";
+
+        loadTasks();
+
+      } catch (error) {
+        console.error("Could not add task:", error);
+      }
+    }
+
+    async function toggleTask(id) {
+      try {
+        await fetch(`${API_URL}/tasks/${id}`, {
+          method: "PUT"
+        });
+
+        loadTasks();
+
+      } catch (error) {
+        console.error("Could not update task:", error);
+      }
+    }
+
+    async function deleteTask(id) {
+      try {
+        await fetch(`${API_URL}/tasks/${id}`, {
+          method: "DELETE"
+        });
+
+        loadTasks();
+
+      } catch (error) {
+        console.error("Could not delete task:", error);
+      }
+    }
+
+    loadTasks();
+  </script>
+
+</body>
+</html>
+
+

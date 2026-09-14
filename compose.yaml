@@ -1,10 +1,16 @@
 services:
 
-  node:
-    build: .
-    image: node-image:1
+  frontend:
+    image: task-frontend
+    ports: 
+      - "8083:80"
+    depends_on: 
+      - backend 
+
+  backend:
+    image: task-backend
     ports:
-      - "8081:3000"
+      - "8082:3000"
     environment:
       DB_HOST: postgres
       DB_USER: taskuser
@@ -23,7 +29,7 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql
     healthcheck:
-      test: ["CMD", "pg_isready"]
+      test: ["CMD", "pg_isready", "-U", "taskuser", "-d", "tasks"]
       interval: 10s
       timeout: 5s
       retries: 5
