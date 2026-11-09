@@ -32,12 +32,31 @@ test("POST /tasks should create a new task", async () => {
   assert.equal(response.status, 201);
   assert.equal(response.body.title, "Automated test task");
   assert.equal(response.body.completed, false);
+  assert.equal(response.body.priority, "medium");
 
   // Clean up
   await request(app).delete(`/tasks/${response.body.id}`);
 });
 
-// TEST 3: Reject task creation without a title
+// TEST 3: Create a task with priority and due date
+test("POST /tasks should save task priority and due date", async () => {
+  const response = await request(app)
+    .post("/tasks")
+    .send({
+      title: "Complete project",
+      priority: "high",
+      due_date: "2026-11-20"
+    });
+
+  assert.equal(response.status, 201);
+  assert.equal(response.body.priority, "high");
+  assert.equal(response.body.due_date.slice(0, 10), "2026-11-20");
+
+  // Clean up
+  await request(app).delete(`/tasks/${response.body.id}`);
+});
+
+// TEST 4: Reject task creation without a title
 test("POST /tasks should reject an empty task title", async () => {
   const response = await request(app)
     .post("/tasks")
@@ -47,7 +66,7 @@ test("POST /tasks should reject an empty task title", async () => {
   assert.equal(response.body.error, "Task title is required");
 });
 
-// TEST 4: Update a task
+// TEST 5: Update a task
 test("PUT /tasks/:id should mark a task as completed", async () => {
   const created = await request(app)
     .post("/tasks")
@@ -63,7 +82,7 @@ test("PUT /tasks/:id should mark a task as completed", async () => {
   await request(app).delete(`/tasks/${created.body.id}`);
 });
 
-// TEST 5: Reject updating a task that does not exist
+// TEST 6: Reject updating a task that does not exist
 test("PUT /tasks/:id should return 404 for a missing task", async () => {
   const response = await request(app).put("/tasks/999999");
 
@@ -71,7 +90,7 @@ test("PUT /tasks/:id should return 404 for a missing task", async () => {
   assert.equal(response.body.error, "Task not found");
 });
 
-// TEST 6: Delete a task
+// TEST 7: Delete a task
 test("DELETE /tasks/:id should delete a task", async () => {
   const created = await request(app)
     .post("/tasks")
@@ -84,7 +103,7 @@ test("DELETE /tasks/:id should delete a task", async () => {
   assert.equal(response.body.message, "Task deleted");
 });
 
-// TEST 7: Reject deleting a task that does not exist
+// TEST 8: Reject deleting a task that does not exist
 test("DELETE /tasks/:id should return 404 for a missing task", async () => {
   const response = await request(app).delete("/tasks/999999");
 

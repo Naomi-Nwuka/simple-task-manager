@@ -27,17 +27,27 @@ app.get("/tasks", async (req, res) => {
 
 app.post("/tasks", async (req, res) => {
   try {
-    const { title } = req.body;
+    const { title, priority = "medium", due_date = null } = req.body;
 
-    if (!title) {
+    if (!title || !title.trim()) {
       return res.status(400).json({
         error: "Task title is required"
       });
     }
 
+    const validPriorities = ["low", "medium", "high"];
+
+    if (!validPriorities.includes(priority)) {
+      return res.status(400).json({
+        error: "Priority must be low, medium, or high"
+      });
+    }
+
     const result = await pool.query(
-      "INSERT INTO tasks (title) VALUES ($1) RETURNING *",
-      [title]
+      `INSERT INTO tasks (title, priority, due_date)
+       VALUES ($1, $2, $3)
+       RETURNING *`,
+      [title.trim(), priority, due_date]
     );
 
     res.status(201).json(result.rows[0]);
