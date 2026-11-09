@@ -1,10 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Task Manager</title>
 
   <style>
@@ -36,8 +34,6 @@
       text-align: center;
       margin-bottom: 30px;
     }
-
-    /* THEME MENU */
 
     .theme-menu {
       position: absolute;
@@ -134,10 +130,17 @@
     .task {
       display: flex;
       align-items: center;
-      justify-content: space-between;
       gap: 12px;
       padding: 15px 10px;
       border-bottom: 1px solid #ddd;
+    }
+
+    .task-checkbox {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      flex-shrink: 0;
+      accent-color: #28a745;
     }
 
     .task-content {
@@ -147,13 +150,11 @@
 
     .task-title {
       display: block;
-      cursor: pointer;
       overflow-wrap: anywhere;
       font-size: 15px;
     }
 
     .completed {
-      text-decoration: line-through;
       color: #888;
     }
 
@@ -333,7 +334,6 @@
         gap: 8px;
       }
     }
-
   </style>
 </head>
 
@@ -344,7 +344,6 @@
     <!-- THEME SELECTOR -->
 
     <div class="theme-menu">
-
       <button
         class="theme-button"
         onclick="toggleThemeMenu()"
@@ -354,21 +353,10 @@
       </button>
 
       <div class="theme-options" id="themeOptions">
-
-        <button onclick="setTheme('light')">
-          ☀️ Light
-        </button>
-
-        <button onclick="setTheme('dark')">
-          🌙 Dark
-        </button>
-
-        <button onclick="setTheme('pink')">
-          🌸 Pink
-        </button>
-
+        <button onclick="setTheme('light')">☀️ Light</button>
+        <button onclick="setTheme('dark')">🌙 Dark</button>
+        <button onclick="setTheme('pink')">🌸 Pink</button>
       </div>
-
     </div>
 
     <h1>Task Manager</h1>
@@ -384,19 +372,9 @@
       >
 
       <select id="priorityInput">
-
-        <option value="low">
-          Low Priority
-        </option>
-
-        <option value="medium" selected>
-          Medium Priority
-        </option>
-
-        <option value="high">
-          High Priority
-        </option>
-
+        <option value="low">Low Priority</option>
+        <option value="medium" selected>Medium Priority</option>
+        <option value="high">High Priority</option>
       </select>
 
       <input
@@ -405,30 +383,21 @@
         title="Select due date"
       >
 
-      <button
-        class="add-button"
-        onclick="addTask()"
-      >
+      <button class="add-button" onclick="addTask()">
         + Add Task
       </button>
 
     </div>
 
-    <!-- TASK LIST -->
-
     <div id="taskList"></div>
 
   </div>
-
 
   <script>
 
     const API_URL = "http://localhost:8082";
 
-
-    /* =========================
-       LOAD TASKS
-       ========================= */
+    /* LOAD TASKS */
 
     async function loadTasks() {
 
@@ -465,13 +434,28 @@
 
           taskDiv.className = "task";
 
+          // CHECKBOX
+
+          const checkbox = document.createElement("input");
+
+          checkbox.type = "checkbox";
+
+          checkbox.className = "task-checkbox";
+
+          checkbox.checked = task.completed;
+
+          checkbox.setAttribute(
+            "aria-label",
+            `Mark ${task.title} as completed`
+          );
+
+          checkbox.onchange = () => toggleTask(task.id);
 
           // TASK CONTENT
 
           const contentDiv = document.createElement("div");
 
           contentDiv.className = "task-content";
-
 
           // TASK TITLE
 
@@ -485,17 +469,13 @@
             title.classList.add("completed");
           }
 
-          title.onclick = () => toggleTask(task.id);
-
-
           // TASK INFORMATION
 
           const metaDiv = document.createElement("div");
 
           metaDiv.className = "task-meta";
 
-
-          // PRIORITY BADGE
+          // PRIORITY
 
           const priorityBadge = document.createElement("span");
 
@@ -506,7 +486,6 @@
           priorityBadge.textContent = `${priority} priority`;
 
           metaDiv.appendChild(priorityBadge);
-
 
           // DUE DATE
 
@@ -523,9 +502,6 @@
             ).toLocaleDateString();
 
             dateElement.textContent = `Due: ${formattedDate}`;
-
-
-            // CHECK IF TASK IS OVERDUE
 
             const today = new Date();
 
@@ -544,11 +520,9 @@
 
           }
 
-
           contentDiv.appendChild(title);
 
           contentDiv.appendChild(metaDiv);
-
 
           // DELETE BUTTON
 
@@ -560,6 +534,7 @@
 
           deleteButton.onclick = () => deleteTask(task.id);
 
+          taskDiv.appendChild(checkbox);
 
           taskDiv.appendChild(contentDiv);
 
@@ -578,9 +553,7 @@
     }
 
 
-    /* =========================
-       ADD TASK
-       ========================= */
+    /* ADD TASK */
 
     async function addTask() {
 
@@ -645,9 +618,7 @@
     }
 
 
-    /* =========================
-       COMPLETE / UNCOMPLETE TASK
-       ========================= */
+    /* COMPLETE / UNCOMPLETE TASK */
 
     async function toggleTask(id) {
 
@@ -674,9 +645,7 @@
     }
 
 
-    /* =========================
-       DELETE TASK
-       ========================= */
+    /* DELETE TASK */
 
     async function deleteTask(id) {
 
@@ -703,9 +672,7 @@
     }
 
 
-    /* =========================
-       THEME MENU
-       ========================= */
+    /* THEME MENU */
 
     function toggleThemeMenu() {
 
@@ -716,24 +683,18 @@
     }
 
 
-    /* =========================
-       CHANGE THEME
-       ========================= */
+    /* CHANGE THEME */
 
     function setTheme(theme) {
 
       document.body.classList.remove("dark", "pink");
 
       if (theme === "dark") {
-
         document.body.classList.add("dark");
-
       }
 
       if (theme === "pink") {
-
         document.body.classList.add("pink");
-
       }
 
       localStorage.setItem("theme", theme);
@@ -745,28 +706,21 @@
     }
 
 
-    /* =========================
-       LOAD SAVED THEME
-       ========================= */
+    /* LOAD SAVED THEME */
 
     const savedTheme = localStorage.getItem("theme");
 
     if (savedTheme) {
-
       setTheme(savedTheme);
-
     }
 
 
-    /* =========================
-       LOAD TASKS WHEN PAGE OPENS
-       ========================= */
+    /* LOAD TASKS WHEN PAGE OPENS */
 
     loadTasks();
-
 
   </script>
 
 </body>
-
 </html>
+```
