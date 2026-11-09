@@ -8,626 +8,561 @@
   <style>
     * {
       box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
     body {
       font-family: Arial, sans-serif;
-      background: #f4f4f4;
+      background: #f4f5f9;
       color: #333;
-      margin: 0;
-      padding: 40px 20px;
+      min-height: 100vh;
+      padding: 30px 15px;
       transition: background 0.3s, color 0.3s;
     }
 
     .container {
-      position: relative;
-      max-width: 700px;
+      max-width: 950px;
       margin: auto;
-      background: white;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      transition: background 0.3s;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 25px;
     }
 
     h1 {
+      font-size: 30px;
+    }
+
+    .theme-select {
+      width: 65px;
+      height: 45px;
+      padding: 5px 8px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: white;
+      cursor: pointer;
+      font-size: 20px;
       text-align: center;
-      margin-bottom: 30px;
+      appearance: auto;
     }
 
-    .theme-menu {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-    }
-
-    .theme-button {
-      background: transparent;
-      font-size: 22px;
-      padding: 6px 8px;
-      border-radius: 6px;
-    }
-
-    .theme-button:hover {
-      background: #eee;
-    }
-
-    .theme-options {
-      display: none;
-      position: absolute;
-      right: 0;
-      top: 42px;
-      width: 130px;
-      background: white;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
-      overflow: hidden;
-      z-index: 10;
-    }
-
-    .theme-options button {
-      display: block;
-      width: 100%;
-      text-align: left;
-      background: white;
-      color: #333;
-      border-radius: 0;
-    }
-
-    .theme-options button:hover {
-      background: #f0f0f0;
-    }
-
-    .theme-options.show {
-      display: block;
-    }
-
-    /* TASK INPUT */
-
-    .input-area {
+    .dashboard {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .stat-card p {
+      font-size: 14px;
+      color: #777;
+      margin-bottom: 10px;
+    }
+
+    .stat-card h2 {
+      font-size: 28px;
+    }
+
+    .total h2 { color: #4f46e5; }
+    .completed-stat h2 { color: #16a34a; }
+    .pending-stat h2 { color: #d97706; }
+    .overdue-stat h2 { color: #dc2626; }
+
+    .task-section {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    .task-section h2 {
+      margin-bottom: 20px;
+    }
+
+    .task-form {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr auto;
       gap: 10px;
       margin-bottom: 25px;
     }
 
-    .input-area input,
-    .input-area select {
-      width: 100%;
-      min-width: 0;
+    input, select, button {
       padding: 12px;
+      border-radius: 6px;
       border: 1px solid #ccc;
-      border-radius: 5px;
       font-size: 14px;
     }
 
-    #taskInput,
-    .add-button {
-      grid-column: 1 / -1;
+    input, select {
+      min-width: 0;
     }
 
     button {
-      padding: 10px 15px;
       border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .add-button {
-      background: #333;
+      background: #4f46e5;
       color: white;
-      font-size: 15px;
+      cursor: pointer;
       font-weight: bold;
     }
 
-    .add-button:hover {
-      opacity: 0.85;
+    button:hover {
+      opacity: 0.9;
     }
 
-    /* TASK LIST */
+    .task-list {
+      list-style: none;
+    }
 
-    .task {
+    .task-item {
       display: flex;
+      justify-content: space-between;
       align-items: center;
+      gap: 15px;
+      padding: 15px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .task-left {
+      display: flex;
+      align-items: flex-start;
       gap: 12px;
-      padding: 15px 10px;
-      border-bottom: 1px solid #ddd;
+      flex: 1;
+      min-width: 0;
     }
 
     .task-checkbox {
       width: 18px;
       height: 18px;
+      margin-top: 3px;
       cursor: pointer;
-      flex-shrink: 0;
-      accent-color: #28a745;
+      accent-color: #4f46e5;
     }
 
-    .task-content {
-      flex: 1;
+    .task-details {
       min-width: 0;
     }
 
     .task-title {
-      display: block;
-      overflow-wrap: anywhere;
       font-size: 15px;
+      overflow-wrap: anywhere;
     }
 
-    .completed {
-      color: #888;
+    .task-title.completed {
+      color: #999;
     }
 
     .task-meta {
       display: flex;
+      align-items: center;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 8px;
       margin-top: 8px;
       font-size: 12px;
-      color: #777;
     }
-
-    /* PRIORITY BADGES */
 
     .priority {
-      display: inline-block;
       padding: 4px 8px;
       border-radius: 20px;
-      font-size: 11px;
       font-weight: bold;
-      text-transform: uppercase;
+      text-transform: capitalize;
     }
 
-    .priority-high {
-      background: #ffe0e0;
-      color: #c62828;
+    .priority.low {
+      background: #dcfce7;
+      color: #166534;
     }
 
-    .priority-medium {
-      background: #fff2cc;
-      color: #946b00;
+    .priority.medium {
+      background: #fef3c7;
+      color: #92400e;
     }
 
-    .priority-low {
-      background: #dff5e3;
-      color: #237a35;
+    .priority.high {
+      background: #fee2e2;
+      color: #991b1b;
     }
-
-    /* DUE DATES */
 
     .due-date {
-      color: #777;
+      color: #666;
     }
 
-    .overdue {
-      color: #d9534f;
+    .overdue-label {
+      color: #dc2626;
       font-weight: bold;
     }
 
-    /* DELETE BUTTON */
-
-    .delete-button {
-      background: #d9534f;
-      color: white;
+    .delete-btn {
+      background: #ef4444;
+      padding: 9px 12px;
       flex-shrink: 0;
-    }
-
-    .delete-button:hover {
-      background: #c9302c;
     }
 
     .empty-message {
       text-align: center;
       color: #888;
-      padding: 25px 10px;
+      padding: 25px 0;
     }
 
-    /* DARK MODE */
+    /* DARK THEME */
 
     body.dark {
-      background: #222;
-      color: #fff;
+      background: #18181b;
+      color: #f4f4f5;
     }
 
-    body.dark .container {
-      background: #333;
+    body.dark .task-section,
+    body.dark .stat-card {
+      background: #27272a;
+      color: #f4f4f5;
+    }
+
+    body.dark .task-item {
+      border-color: #444;
+    }
+
+    body.dark .task-title.completed {
+      color: #888;
+    }
+
+    body.dark .due-date,
+    body.dark .stat-card p {
+      color: #aaa;
     }
 
     body.dark input,
     body.dark select {
-      background: #444;
-      color: #fff;
-      border-color: #666;
-    }
-
-    body.dark .task {
+      background: #3f3f46;
+      color: white;
       border-color: #555;
     }
 
-    body.dark .add-button {
-      background: #111;
-    }
-
-    body.dark .theme-button:hover {
-      background: #444;
-    }
-
-    body.dark .theme-options {
-      background: #444;
-      border-color: #666;
-    }
-
-    body.dark .theme-options button {
-      background: #444;
+    body.dark .theme-select {
+      background: #3f3f46;
       color: white;
     }
 
-    body.dark .theme-options button:hover {
-      background: #555;
-    }
-
-    body.dark .task-meta,
-    body.dark .due-date {
-      color: #ccc;
-    }
-
-    /* PINK MODE */
+    /* PINK THEME */
 
     body.pink {
-      background: #ffe6f0;
-      color: #5a2942;
-    }
-
-    body.pink .container {
       background: #fff0f6;
+      color: #831843;
     }
 
-    body.pink input,
-    body.pink select {
-      background: white;
-      color: #5a2942;
-      border-color: #f3a6c4;
+    body.pink .task-section,
+    body.pink .stat-card {
+      background: #fff;
+      color: #831843;
     }
 
-    body.pink .task {
-      border-color: #f3a6c4;
+    body.pink button {
+      background: #db2777;
     }
 
-    body.pink .add-button {
-      background: #d63384;
+    body.pink .task-checkbox {
+      accent-color: #db2777;
     }
 
-    body.pink .theme-button:hover {
-      background: #ffd1e3;
+    body.pink .total h2,
+    body.pink .completed-stat h2,
+    body.pink .pending-stat h2,
+    body.pink .overdue-stat h2 {
+      color: #db2777;
     }
 
-    body.pink .theme-options {
-      background: #fff0f6;
-      border-color: #f3a6c4;
-    }
-
-    body.pink .theme-options button {
-      background: #fff0f6;
-      color: #5a2942;
-    }
-
-    body.pink .theme-options button:hover {
-      background: #ffd1e3;
-    }
-
-    /* MOBILE RESPONSIVENESS */
-
-    @media (max-width: 500px) {
-      body {
-        padding: 15px;
+    @media (max-width: 700px) {
+      .dashboard {
+        grid-template-columns: repeat(2, 1fr);
       }
 
-      .container {
-        padding: 20px;
+      .task-form {
+        grid-template-columns: 1fr 1fr;
       }
 
-      .task {
+      .task-form input:first-child {
+        grid-column: 1 / -1;
+      }
+
+      .task-form button {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 400px) {
+      header {
         align-items: flex-start;
+        flex-direction: column;
       }
 
-      .task-meta {
-        gap: 8px;
+      .task-section {
+        padding: 18px;
       }
     }
   </style>
 </head>
 
 <body>
-
   <div class="container">
 
-    <!-- THEME SELECTOR -->
+    <header>
+      <h1>My Task Manager</h1>
 
-    <div class="theme-menu">
-      <button
-        class="theme-button"
-        onclick="toggleThemeMenu()"
-        title="Change theme"
+      <select
+        class="theme-select"
+        id="themeSelect"
+        onchange="changeTheme()"
+        aria-label="Choose theme"
+        title="Choose theme"
       >
-        🎨
-      </button>
-
-      <div class="theme-options" id="themeOptions">
-        <button onclick="setTheme('light')">☀️ Light</button>
-        <button onclick="setTheme('dark')">🌙 Dark</button>
-        <button onclick="setTheme('pink')">🌸 Pink</button>
-      </div>
-    </div>
-
-    <h1>Task Manager</h1>
-
-    <!-- TASK CREATION FORM -->
-
-    <div class="input-area">
-
-      <input
-        type="text"
-        id="taskInput"
-        placeholder="What do you need to get done?"
-      >
-
-      <select id="priorityInput">
-        <option value="low">Low Priority</option>
-        <option value="medium" selected>Medium Priority</option>
-        <option value="high">High Priority</option>
+        <option value="light">☀️</option>
+        <option value="dark">🌙</option>
+        <option value="pink">🌸</option>
       </select>
+    </header>
 
-      <input
-        type="date"
-        id="dueDateInput"
-        title="Select due date"
-      >
+    <section class="dashboard">
+      <div class="stat-card total">
+        <p>Total Tasks</p>
+        <h2 id="totalTasks">0</h2>
+      </div>
 
-      <button class="add-button" onclick="addTask()">
-        + Add Task
-      </button>
+      <div class="stat-card completed-stat">
+        <p>Completed</p>
+        <h2 id="completedTasks">0</h2>
+      </div>
 
-    </div>
+      <div class="stat-card pending-stat">
+        <p>Pending</p>
+        <h2 id="pendingTasks">0</h2>
+      </div>
 
-    <div id="taskList"></div>
+      <div class="stat-card overdue-stat">
+        <p>Overdue</p>
+        <h2 id="overdueTasks">0</h2>
+      </div>
+    </section>
+
+    <section class="task-section">
+      <h2>My Tasks</h2>
+
+      <form class="task-form" id="taskForm">
+        <input
+          type="text"
+          id="taskInput"
+          placeholder="What needs to be done?"
+          required
+        >
+
+        <select id="priorityInput">
+          <option value="low">Low Priority</option>
+          <option value="medium" selected>Medium Priority</option>
+          <option value="high">High Priority</option>
+        </select>
+
+        <input type="date" id="dueDateInput">
+
+        <button type="submit">Add Task</button>
+      </form>
+
+      <ul class="task-list" id="taskList"></ul>
+    </section>
 
   </div>
 
   <script>
-
     const API_URL = "http://localhost:8082";
 
-    /* LOAD TASKS */
+    let tasks = [];
 
     async function loadTasks() {
-
       try {
-
         const response = await fetch(`${API_URL}/tasks`);
 
         if (!response.ok) {
-          throw new Error("Could not retrieve tasks");
+          throw new Error("Could not load tasks");
         }
 
-        const tasks = await response.json();
+        tasks = await response.json();
 
-        const taskList = document.getElementById("taskList");
-
-        taskList.innerHTML = "";
-
-        if (tasks.length === 0) {
-
-          const emptyMessage = document.createElement("p");
-
-          emptyMessage.className = "empty-message";
-
-          emptyMessage.textContent = "No tasks yet. Add your first task!";
-
-          taskList.appendChild(emptyMessage);
-
-          return;
-        }
-
-        tasks.forEach(task => {
-
-          const taskDiv = document.createElement("div");
-
-          taskDiv.className = "task";
-
-          // CHECKBOX
-
-          const checkbox = document.createElement("input");
-
-          checkbox.type = "checkbox";
-
-          checkbox.className = "task-checkbox";
-
-          checkbox.checked = task.completed;
-
-          checkbox.setAttribute(
-            "aria-label",
-            `Mark ${task.title} as completed`
-          );
-
-          checkbox.onchange = () => toggleTask(task.id);
-
-          // TASK CONTENT
-
-          const contentDiv = document.createElement("div");
-
-          contentDiv.className = "task-content";
-
-          // TASK TITLE
-
-          const title = document.createElement("span");
-
-          title.className = "task-title";
-
-          title.textContent = task.title;
-
-          if (task.completed) {
-            title.classList.add("completed");
-          }
-
-          // TASK INFORMATION
-
-          const metaDiv = document.createElement("div");
-
-          metaDiv.className = "task-meta";
-
-          // PRIORITY
-
-          const priorityBadge = document.createElement("span");
-
-          const priority = task.priority || "medium";
-
-          priorityBadge.className = `priority priority-${priority}`;
-
-          priorityBadge.textContent = `${priority} priority`;
-
-          metaDiv.appendChild(priorityBadge);
-
-          // DUE DATE
-
-          if (task.due_date) {
-
-            const dueDate = task.due_date.slice(0, 10);
-
-            const dateElement = document.createElement("span");
-
-            dateElement.className = "due-date";
-
-            const formattedDate = new Date(
-              `${dueDate}T00:00:00`
-            ).toLocaleDateString();
-
-            dateElement.textContent = `Due: ${formattedDate}`;
-
-            const today = new Date();
-
-            const todayString =
-              `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-
-            if (!task.completed && dueDate < todayString) {
-
-              dateElement.classList.add("overdue");
-
-              dateElement.textContent += " (Overdue)";
-
-            }
-
-            metaDiv.appendChild(dateElement);
-
-          }
-
-          contentDiv.appendChild(title);
-
-          contentDiv.appendChild(metaDiv);
-
-          // DELETE BUTTON
-
-          const deleteButton = document.createElement("button");
-
-          deleteButton.className = "delete-button";
-
-          deleteButton.textContent = "Delete";
-
-          deleteButton.onclick = () => deleteTask(task.id);
-
-          taskDiv.appendChild(checkbox);
-
-          taskDiv.appendChild(contentDiv);
-
-          taskDiv.appendChild(deleteButton);
-
-          taskList.appendChild(taskDiv);
-
-        });
+        updateDashboard();
+        displayTasks();
 
       } catch (error) {
-
-        console.error("Could not load tasks:", error);
-
+        console.error("Error loading tasks:", error);
+        alert("Unable to load tasks. Please check that the application is running.");
       }
-
     }
 
+    function updateDashboard() {
+      const total = tasks.length;
 
-    /* ADD TASK */
+      const completed = tasks.filter(task => task.completed).length;
 
-    async function addTask() {
+      const pending = total - completed;
 
-      const input = document.getElementById("taskInput");
+      const today = getTodayDate();
 
+      const overdue = tasks.filter(task => {
+        return (
+          !task.completed &&
+          task.due_date &&
+          String(task.due_date).slice(0, 10) < today
+        );
+      }).length;
+
+      document.getElementById("totalTasks").textContent = total;
+      document.getElementById("completedTasks").textContent = completed;
+      document.getElementById("pendingTasks").textContent = pending;
+      document.getElementById("overdueTasks").textContent = overdue;
+    }
+
+    function getTodayDate() {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, "0");
+      const day = String(today.getDate()).padStart(2, "0");
+
+      return `${year}-${month}-${day}`;
+    }
+
+    function displayTasks() {
+      const taskList = document.getElementById("taskList");
+
+      taskList.innerHTML = "";
+
+      if (tasks.length === 0) {
+        const message = document.createElement("li");
+        message.className = "empty-message";
+        message.textContent = "No tasks yet. Add your first task above!";
+        taskList.appendChild(message);
+        return;
+      }
+
+      tasks.forEach(task => {
+        const listItem = document.createElement("li");
+        listItem.className = "task-item";
+
+        const taskLeft = document.createElement("div");
+        taskLeft.className = "task-left";
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.className = "task-checkbox";
+        checkbox.checked = task.completed;
+        checkbox.addEventListener("change", () => toggleTask(task.id));
+
+        const taskDetails = document.createElement("div");
+        taskDetails.className = "task-details";
+
+        const title = document.createElement("p");
+        title.className = "task-title";
+
+        if (task.completed) {
+          title.classList.add("completed");
+        }
+
+        title.textContent = task.title;
+
+        const meta = document.createElement("div");
+        meta.className = "task-meta";
+
+        const priority = document.createElement("span");
+        const priorityValue = task.priority || "medium";
+
+        priority.className = `priority ${priorityValue}`;
+        priority.textContent = `${priorityValue} priority`;
+
+        meta.appendChild(priority);
+
+        if (task.due_date) {
+          const dueDate = String(task.due_date).slice(0, 10);
+          const dueDateElement = document.createElement("span");
+
+          dueDateElement.className = "due-date";
+          dueDateElement.textContent = `Due: ${dueDate}`;
+
+          if (!task.completed && dueDate < getTodayDate()) {
+            dueDateElement.classList.add("overdue-label");
+            dueDateElement.textContent += " (Overdue)";
+          }
+
+          meta.appendChild(dueDateElement);
+        }
+
+        taskDetails.appendChild(title);
+        taskDetails.appendChild(meta);
+
+        taskLeft.appendChild(checkbox);
+        taskLeft.appendChild(taskDetails);
+
+        const deleteButton = document.createElement("button");
+        deleteButton.className = "delete-btn";
+        deleteButton.textContent = "Delete";
+        deleteButton.addEventListener("click", () => deleteTask(task.id));
+
+        listItem.appendChild(taskLeft);
+        listItem.appendChild(deleteButton);
+
+        taskList.appendChild(listItem);
+      });
+    }
+
+    document.getElementById("taskForm").addEventListener("submit", async function(event) {
+      event.preventDefault();
+
+      const title = document.getElementById("taskInput").value.trim();
       const priority = document.getElementById("priorityInput").value;
-
       const dueDate = document.getElementById("dueDateInput").value;
 
-      const title = input.value.trim();
-
       if (!title) {
-
-        alert("Please enter a task title.");
-
+        alert("Please enter a task.");
         return;
-
       }
 
       try {
-
         const response = await fetch(`${API_URL}/tasks`, {
-
           method: "POST",
-
           headers: {
             "Content-Type": "application/json"
           },
-
           body: JSON.stringify({
-
             title: title,
-
             priority: priority,
-
             due_date: dueDate || null
-
           })
-
         });
 
         if (!response.ok) {
           throw new Error("Could not add task");
         }
 
-        input.value = "";
-
+        document.getElementById("taskInput").value = "";
         document.getElementById("priorityInput").value = "medium";
-
         document.getElementById("dueDateInput").value = "";
 
         await loadTasks();
 
       } catch (error) {
-
-        console.error("Could not add task:", error);
-
-        alert("Something went wrong while adding your task.");
-
+        console.error("Error adding task:", error);
+        alert("Unable to add task.");
       }
-
-    }
-
-
-    /* COMPLETE / UNCOMPLETE TASK */
+    });
 
     async function toggleTask(id) {
-
       try {
-
         const response = await fetch(`${API_URL}/tasks/${id}`, {
-
           method: "PUT"
-
         });
 
         if (!response.ok) {
@@ -637,24 +572,19 @@
         await loadTasks();
 
       } catch (error) {
-
-        console.error("Could not update task:", error);
-
+        console.error("Error updating task:", error);
+        alert("Unable to update task.");
       }
-
     }
 
-
-    /* DELETE TASK */
-
     async function deleteTask(id) {
+      const confirmDelete = confirm("Are you sure you want to delete this task?");
+
+      if (!confirmDelete) return;
 
       try {
-
         const response = await fetch(`${API_URL}/tasks/${id}`, {
-
           method: "DELETE"
-
         });
 
         if (!response.ok) {
@@ -664,63 +594,27 @@
         await loadTasks();
 
       } catch (error) {
-
-        console.error("Could not delete task:", error);
-
+        console.error("Error deleting task:", error);
+        alert("Unable to delete task.");
       }
-
     }
 
+    function changeTheme() {
+      const theme = document.getElementById("themeSelect").value;
 
-    /* THEME MENU */
-
-    function toggleThemeMenu() {
-
-      const themeOptions = document.getElementById("themeOptions");
-
-      themeOptions.classList.toggle("show");
-
+      document.body.className = theme === "light" ? "" : theme;
+      localStorage.setItem("taskManagerTheme", theme);
     }
 
+    function loadTheme() {
+      const savedTheme = localStorage.getItem("taskManagerTheme") || "light";
 
-    /* CHANGE THEME */
-
-    function setTheme(theme) {
-
-      document.body.classList.remove("dark", "pink");
-
-      if (theme === "dark") {
-        document.body.classList.add("dark");
-      }
-
-      if (theme === "pink") {
-        document.body.classList.add("pink");
-      }
-
-      localStorage.setItem("theme", theme);
-
-      document
-        .getElementById("themeOptions")
-        .classList.remove("show");
-
+      document.getElementById("themeSelect").value = savedTheme;
+      document.body.className = savedTheme === "light" ? "" : savedTheme;
     }
 
-
-    /* LOAD SAVED THEME */
-
-    const savedTheme = localStorage.getItem("theme");
-
-    if (savedTheme) {
-      setTheme(savedTheme);
-    }
-
-
-    /* LOAD TASKS WHEN PAGE OPENS */
-
+    loadTheme();
     loadTasks();
-
   </script>
-
 </body>
 </html>
-```
