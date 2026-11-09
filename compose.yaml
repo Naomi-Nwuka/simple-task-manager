@@ -1,14 +1,13 @@
 services:
-
   frontend:
-   build:
-     context: .
-     dockerfile: frontend/Dockerfile 
-   image: task-frontend
-   ports: 
-     - "8083:80"
-   depends_on: 
-     - backend 
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    image: task-frontend
+    ports:
+      - "8083:80"
+    depends_on:
+      - backend
 
   backend:
     build:
@@ -19,12 +18,13 @@ services:
       - "8082:3000"
     volumes:
       - ./backend:/app
-      - /app/node_modules 
+      - /app/node_modules
     environment:
       DB_HOST: postgres
       DB_USER: taskuser
       DB_PASSWORD: taskpass
       DB_NAME: tasks
+      JWT_SECRET: replace-this-with-a-long-random-secret-before-deployment
     depends_on:
       postgres:
         condition: service_healthy

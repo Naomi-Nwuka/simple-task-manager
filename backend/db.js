@@ -9,16 +9,24 @@ const pool = new Pool({
 });
 
 async function setupDatabase() {
-  // Create the tasks table if it does not exist
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS users (
+      id SERIAL PRIMARY KEY,
+      name TEXT NOT NULL,
+      email TEXT NOT NULL UNIQUE,
+      password_hash TEXT NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `);
+
   await pool.query(`
     CREATE TABLE IF NOT EXISTS tasks (
       id SERIAL PRIMARY KEY,
       title TEXT NOT NULL,
-      completed BOOLEAN DEFAULT FALSE
+      completed BOOLEAN NOT NULL DEFAULT FALSE
     )
   `);
 
-  // Add priority to existing tasks
   await pool.query(`
     ALTER TABLE tasks
     ADD COLUMN IF NOT EXISTS priority TEXT
@@ -26,10 +34,33 @@ async function setupDatabase() {
     CHECK (priority IN ('low', 'medium', 'high'))
   `);
 
-  // Add due date to existing tasks
   await pool.query(`
     ALTER TABLE tasks
     ADD COLUMN IF NOT EXISTS due_date DATE
+  `);
+
+  await pool.query(`
+    ALTER TABLE tasks
+    ADD COLUMN IF NOT EXISTS category TEXT
+    NOT NULL DEFAULT 'other'
+    CHECK (category IN ('work', 'personal', 'shopping', 'other'))
+  `);
+
+  await pool.query(`
+    ALTER TABLE tasks
+    ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ
+    NOT NULL DEFAULT NOW()
+  `);
+
+  await pool.query(`
+    ALTER TABLE tasks
+    ADD COLUMN IF NOT EXISTS user_id INTEGER
+    REFERENCES users(id) ON DELETE CASCADE
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS tasks_user_id_idx
+    ON tasks(user_id)
   `);
 }
 
